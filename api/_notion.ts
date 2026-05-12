@@ -14,8 +14,18 @@ export function notionHeaders() {
   return {
     Authorization: `Bearer ${getEnv('NOTION_API_KEY')}`,
     'Content-Type': 'application/json',
+    Accept: 'application/json',
     'Notion-Version': process.env.NOTION_VERSION || '2022-06-28',
   };
+}
+
+function parseNotionResponse(text: string) {
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`Notion returned a non-JSON response: ${text.slice(0, 500)}`);
+  }
 }
 
 export async function notionRequest(path: string, options: RequestInit = {}) {
@@ -28,7 +38,7 @@ export async function notionRequest(path: string, options: RequestInit = {}) {
   });
 
   const text = await response.text();
-  const data = text ? JSON.parse(text) : null;
+  const data = parseNotionResponse(text);
 
   if (!response.ok) {
     const message = data?.message || response.statusText || 'Notion API request failed';
@@ -65,26 +75,6 @@ export async function getDatabaseSchema(databaseId: string) {
   return data.properties || {};
 }
 
-export async function updatePageProperties(pageId: string, databaseId: string, candidateProperties: Record<string, any>) {
-  const schema = await getDatabaseSchema(databaseId);
-  const safeProperties: Record<string, any> = {};
-
-  for (const [propertyName, value] of Object.entries(candidateProperties)) {
-    if (schema[propertyName]) {
-      safeProperties[propertyName] = value;
-    }
-  }
-
-  if (Object.keys(safeProperties).length === 0) {
-    return { ok: true, skipped: true, reason: 'No matching Notion properties found to update.' };
-  }
-
-  return notionRequest(`/pages/${pageId}`, {
-    method: 'PATCH',
-    body: JSON.stringify({ properties: safeProperties }),
-  });
-}
-
 export function plainText(prop: NotionProperty | undefined): string {
   if (!prop) return '';
   if (prop.type === 'title') return (prop.title || []).map((r: any) => r.plain_text || '').join('');
@@ -99,28 +89,6 @@ export function plainText(prop: NotionProperty | undefined): string {
   if (prop.type === 'email') return prop.email || '';
   if (prop.type === 'phone_number') return prop.phone_number || '';
   return '';
-}
-
-export function selectProperty(name: string | undefined) {
-  return name ? { select: { name } } : undefined;
-}
-
-export function statusProperty(name: string | undefined) {
-  return name ? { status: { name } } : undefined;
-}
-
-export function richTextProperty(value: string | undefined) {
-  return value !== undefined
-    ? { rich_text: [{ text: { content: value.slice(0, 1900) } }] }
-    : undefined;
-}
-
-export function dateProperty(value: string | undefined) {
-  return value ? { date: { start: value } } : { date: null };
-}
-
-export function removeUndefinedProperties(properties: Record<string, any>) {
-  return Object.fromEntries(Object.entries(properties).filter(([, value]) => value !== undefined));
 }
 
 export function propertyValueForSchema(schemaEntry: any, value: string | null | undefined) {

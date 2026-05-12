@@ -18,17 +18,48 @@ function normaliseChapter(chapter: string) {
   return match ? Number(match[0]) : 999;
 }
 
+function createReadableApiError(url: string, status: number, body: string) {
+  const cleanBody = body.trim();
+
+  if (!cleanBody) {
+    return `${url} returned HTTP ${status} with no response body.`;
+  }
+
+  if (cleanBody.startsWith('<!DOCTYPE') || cleanBody.startsWith('<html')) {
+    return `${url} returned an HTML error page instead of JSON. This usually means the Vercel API function crashed before it could respond. Check the Vercel Function Logs and open /api/health.`;
+  }
+
+  if (cleanBody.startsWith('A server error')) {
+    return `${url} returned a Vercel server error instead of JSON. This usually means the API function failed before the app could receive a proper error. Open /api/health and check Vercel Function Logs.`;
+  }
+
+  return `${url} returned HTTP ${status}: ${cleanBody.slice(0, 500)}`;
+}
+
 async function jsonFetch<T>(url: string, options?: RequestInit): Promise<T> {
   const response = await fetch(url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
+      Accept: 'application/json',
       ...(options?.headers || {}),
     },
   });
-  const data = await response.json();
-  if (!response.ok || data.ok === false) throw new Error(data.error || 'Request failed');
-  return data;
+
+  const text = await response.text();
+  let data: any = null;
+
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    throw new Error(createReadableApiError(url, response.status, text));
+  }
+
+  if (!response.ok || data?.ok === false) {
+    throw new Error(data?.error || createReadableApiError(url, response.status, text));
+  }
+
+  return data as T;
 }
 
 export default function App() {
@@ -57,7 +88,7 @@ export default function App() {
       setTerms(termData.terms.sort((a, b) => normaliseChapter(a.chapter) - normaliseChapter(b.chapter) || a.term.localeCompare(b.term)));
       setQuestions(mcqData.questions.sort((a, b) => normaliseChapter(a.chapter) - normaliseChapter(b.chapter)));
     } catch (err: any) {
-      setError(err.message || 'Could not connect to Notion. Check environment variables and database sharing.');
+      setError(err.message || 'Could not connect to Notion. Check /api/health, environment variables, database IDs, and Notion database sharing.');
     } finally {
       setLoading(false);
     }
@@ -181,7 +212,12 @@ export default function App() {
         </div>
       </section>
 
-      {error && <div className="alert">{error}</div>}
+      {error && (
+        <div className="alert">
+          <strong>Connection issue:</strong> {error}
+          <p className="alert-help">After redeploying this patch, open <code>/api/health</code> on your site to see which Notion setting is failing.</p>
+        </div>
+      )}
       {loading ? <div className="card loading-card">Loading study data from Notion...</div> : null}
 
       <nav className="tab-bar" aria-label="Study modes">
