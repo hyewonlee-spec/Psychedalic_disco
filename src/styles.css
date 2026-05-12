@@ -1,0 +1,392 @@
+/* ========================================================================== 
+   Base
+   ========================================================================== */
+:root {
+  color-scheme: light;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #1d1a24;
+  background: #f6f3fa;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --ink: #1d1a24;
+  --muted: #6f6879;
+  --soft: #f6f3fa;
+  --card: #ffffff;
+  --brand: #51306f;
+  --brand-soft: #eee6f6;
+  --border: #e7dff0;
+  --danger: #9d2d4f;
+  --danger-soft: #fbe8ee;
+  --success: #237457;
+  --success-soft: #e7f5ee;
+  --shadow: 0 18px 45px rgba(42, 25, 67, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+select,
+input,
+textarea {
+  font: inherit;
+  font-size: 16px;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* ========================================================================== 
+   Layout
+   ========================================================================== */
+.app-shell {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.hero-card,
+.card,
+.stat-card,
+.tab-bar,
+.alert {
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.hero-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+  border-radius: 32px;
+  padding: 28px;
+}
+
+.hero-card h1 {
+  margin: 4px 0 8px;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+
+.hero-copy {
+  max-width: 720px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.hero-actions,
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.weak-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.wide-card {
+  grid-column: span 2;
+}
+
+.card,
+.loading-card,
+.alert {
+  border-radius: 28px;
+  padding: 24px;
+}
+
+.study-card {
+  margin-top: 16px;
+}
+
+.study-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.study-header h2,
+.card h2 {
+  margin: 0;
+  font-size: clamp(1.55rem, 3vw, 2.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.split-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.stack {
+  display: grid;
+  gap: 20px;
+}
+
+/* ========================================================================== 
+   Controls
+   ========================================================================== */
+.button,
+.select,
+.tab,
+.option {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.button {
+  padding: 11px 16px;
+  font-weight: 800;
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.button-secondary {
+  background: var(--brand-soft);
+  border-color: var(--brand-soft);
+  color: var(--brand);
+}
+
+.button-danger {
+  background: var(--danger-soft);
+  border-color: var(--danger-soft);
+  color: var(--danger);
+}
+
+.button-success {
+  background: var(--success-soft);
+  border-color: var(--success-soft);
+  color: var(--success);
+}
+
+.select {
+  min-width: 180px;
+  padding: 11px 14px;
+  font-weight: 800;
+}
+
+.full-select {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  border-radius: 24px;
+  padding: 8px;
+}
+
+.tab {
+  padding: 11px 16px;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.tab-active {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+
+/* ========================================================================== 
+   Cards and study content
+   ========================================================================== */
+.stat-card {
+  border-radius: 26px;
+  padding: 20px;
+}
+
+.stat-card p,
+.eyebrow,
+.label {
+  margin: 0;
+  color: var(--brand);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stat-card strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 2.35rem;
+  line-height: 1;
+}
+
+.stat-card span,
+.muted {
+  color: var(--muted);
+}
+
+.answer-panel,
+.feedback {
+  margin: 22px 0;
+  border-radius: 24px;
+  padding: 22px;
+  background: var(--soft);
+  line-height: 1.75;
+}
+
+.prompt {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.pill {
+  white-space: nowrap;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 900;
+}
+
+.option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.option {
+  min-height: 84px;
+  padding: 18px;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.option-selected {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.feedback-correct {
+  background: var(--success-soft);
+}
+
+.feedback-incorrect {
+  background: var(--danger-soft);
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 16px;
+  font-weight: 900;
+}
+
+.item-list,
+.compact-list,
+.numbered-list {
+  display: grid;
+  gap: 10px;
+}
+
+.compact-list,
+.numbered-list {
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.list-item {
+  border-radius: 20px;
+  background: var(--soft);
+  padding: 16px;
+}
+
+.list-item h3 {
+  margin: 4px 0 6px;
+}
+
+.list-item p:last-child {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.empty-state {
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.alert {
+  margin-top: 16px;
+  border-color: #f2bfd0;
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-weight: 800;
+}
+
+/* ========================================================================== 
+   Responsive
+   ========================================================================== */
+@media (max-width: 900px) {
+  .hero-card,
+  .study-header {
+    flex-direction: column;
+  }
+
+  .dashboard-grid,
+  .weak-grid,
+  .option-grid,
+  .split-list {
+    grid-template-columns: 1fr;
+  }
+
+  .wide-card {
+    grid-column: span 1;
+  }
+
+  .hero-actions,
+  .select {
+    width: 100%;
+  }
+
+  .button,
+  .tab {
+    flex: 1 1 auto;
+  }
+}
